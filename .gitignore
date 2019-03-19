@@ -1,0 +1,12 @@
+# python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+
+# private_settings
+*secret.py
+
+#database
+db/.env
+db/data/

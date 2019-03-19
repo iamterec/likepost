@@ -1,0 +1,12 @@
+Flask
+
+# REST API creation
+flask-jwt-extended
+Flask-RESTful
+
+# database
+psycopg2
+FLASK-SQLAlchemy
+
+# Server
+gunicorn

@@ -1,0 +1,26 @@
+version: "3"
+
+services:
+    api:
+        build: ./likepost/
+        restart: always
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./likepost/:/likepost/
+        command: >
+            gunicorn -b 0.0.0.0:8000
+            --access-logfile -
+            --reload
+            --chdir /likepost
+            "app:create_app()"
+
+    # postgres:
+    #     restart: always
+    #     image: postgres
+    #     ports:
+    #         - "5432:5432"
+    #     volumes:
+    #         - ./db/data:/var/lib/postgresql/data
+    #     env_file:
+    #         - "./db/.env"
