@@ -8,5 +8,8 @@ Flask-RESTful
 psycopg2
 FLASK-SQLAlchemy
 
+# data validation
+cerberus
+
 # Server
 gunicorn

@@ -3,6 +3,8 @@ version: "3"
 services:
     api:
         build: ./likepost/
+        depends_on:
+            - postgres
         restart: always
         ports:
             - "8000:8000"
@@ -15,12 +17,12 @@ services:
             --chdir /likepost
             "app:create_app()"
 
-    # postgres:
-    #     restart: always
-    #     image: postgres
-    #     ports:
-    #         - "5432:5432"
-    #     volumes:
-    #         - ./db/data:/var/lib/postgresql/data
-    #     env_file:
-    #         - "./db/.env"
+    postgres:
+        restart: always
+        image: postgres
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./db/data:/var/lib/postgresql/data
+        env_file:
+            - "./db/.env"
