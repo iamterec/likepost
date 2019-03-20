@@ -8,11 +8,13 @@ from config.general import DevelopmentConfig
 from config.secret import SecretConfig
 
 
-def create_app():
+def create_app(settings_override=None):
     app = Flask(__name__)
 
     app.config.from_object(DevelopmentConfig)
     app.config.from_object(SecretConfig)
+    if settings_override:
+        app.config.update(settings_override)
 
     connect_resources(api)
     init_extensions(app)

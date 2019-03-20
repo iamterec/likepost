@@ -7,9 +7,9 @@ from cerberus import Validator  # data validation
 
 class Registration(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument("username", required=True, type=str)
-    parser.add_argument("email", required=True, type=str)
-    parser.add_argument("password", required=True, type=str)
+    parser.add_argument("username", type=str)
+    parser.add_argument("email", type=str)
+    parser.add_argument("password", type=str)
 
     def post(self):
         data = self.parser.parse_args()
@@ -24,9 +24,11 @@ class Registration(Resource):
             db.session.add(user)
             db.session.commit()
         except IntegrityError:
+            db.session.rollback()
             return {"user": "User with this email already exist"}, 409
         except DataError:
-            return {"error": "Too logn data"}, 403
+            db.session.rollback()
+            return {"error": "The data is too long"}, 403
 
         return {"msg": "User has been created",
                 "user": user.to_dict()}, 200
@@ -40,3 +42,11 @@ class Registration(Resource):
         result = validator.validate(data)
         if not result:
             return validator.errors, 400
+
+    def delete(self):
+        data = self.parser.parse_args()
+        user = User.query.filter(User.email==data["email"]).first()
+        if user:
+            db.session.delete(user)
+            db.session.commit()
+            return {"user": "User has been deleted"}, 200
