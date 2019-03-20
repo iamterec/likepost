@@ -19,9 +19,10 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.password, password)
 
-    def to_dict(self):
+    def to_dict(self, username=False):
         user_dict = {}
         user_dict["id"] = self.id
         user_dict["email"] = self.email
-        user_dict["username"] = self.username
+        if username:
+            user_dict["username"] = self.username
         return user_dict

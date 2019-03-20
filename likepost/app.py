@@ -1,7 +1,7 @@
 from flask import Flask
 
 from routes import connect_resources
-from extensions import api, db
+from extensions import api, db, jwt
 
 # Settings import
 from config.general import DevelopmentConfig
@@ -27,8 +27,11 @@ def create_app(settings_override=None):
 def init_extensions(app):
     api.init_app(app)
     api.app = app
+
     db.init_app(app)
     db.app = app
+
+    jwt.init_app(app)
 
 if __name__ == "__main__":
     create_app().run(debug=True, host='0.0.0.0', port='8000')

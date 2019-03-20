@@ -1,11 +1,14 @@
+import datetime
 from flask_restful import Resource, reqparse
 from models.user import User
 from extensions import db
 
 from sqlalchemy.exc import IntegrityError, DataError
 from cerberus import Validator  # data validation
+from flask_jwt_extended import create_access_token
 
-class Registration(Resource):
+
+class Signup(Resource):
     parser = reqparse.RequestParser()
     parser.add_argument("username", type=str)
     parser.add_argument("email", type=str)
@@ -37,7 +40,7 @@ class Registration(Resource):
         schema = {"email": {"required": True, "type": "string", "minlength": 6,
                             "regex": "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"},
                   "password": {"required": True, "type": "string", "minlength": 3},
-                  "username": {"required": False}}
+                  "username": {"required": False, 'nullable': True}}
         validator = Validator(schema)
         result = validator.validate(data)
         if not result:
@@ -50,3 +53,20 @@ class Registration(Resource):
             db.session.delete(user)
             db.session.commit()
             return {"user": "User has been deleted"}, 200
+
+
+class Login(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument("email", required=True, type=str)
+    parser.add_argument("password", required=True, type=str)
+
+    def post(self):
+        data = self.parser.parse_args()
+        user = User.query.filter(User.email == data["email"]).first()
+        if user and user.check_password(data["password"]):
+            identity = user.to_dict(username=False)
+            expires = datetime.timedelta(seconds=178800)
+            access_token = create_access_token(identity=identity, expires_delta=expires)
+            return {"access_token": access_token}, 200
+        else:
+            return {"msg": "Wrong e-mail or password"}, 422

@@ -40,8 +40,6 @@ def client_with_user(app, test_user_data):
     client = app.test_client()
     resp = client.post("/users", data=user_data)
     assert resp.status_code == 200
-
     yield
-
     resp = client.delete("/users", data=user_data)
     assert resp.status_code == 200
