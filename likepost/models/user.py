@@ -8,6 +8,11 @@ class User(db.Model):
     username = db.Column(db.String(64))
     email = db.Column(db.String(128), unique=True, index=True)
     password = db.Column(db.String(256), nullable=False)
+    posts = db.relationship("Post", cascade="all, delete-orphan",
+                            backref="creator", lazy=True,
+                            foreign_keys="Post.creator_id")
+    liked_posts = db.relationship("Post", secondary="likes",
+                                  back_populates="liked_by")
 
     def __init__(self, email, username=None):
         self.email = email

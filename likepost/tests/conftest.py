@@ -1,8 +1,6 @@
 import pytest
 from app import create_app
-# database
-# from models.user import User
-# from extensions import db
+from tests.test_users import LOGIN_ENDPOINT
 
 
 @pytest.yield_fixture(scope='session')
@@ -22,12 +20,14 @@ def app():
 
     ctx.pop()
 
+
 @pytest.fixture(scope="session")
 def test_user_data():
     user_data = {"email": "temp_user@mail.com",
                  "password": "temp_password",
                  "username": "some_user"}
     return user_data
+
 
 @pytest.yield_fixture(scope='function')
 def client(app):
@@ -38,8 +38,22 @@ def client(app):
 def client_with_user(app, test_user_data):
     user_data = test_user_data
     client = app.test_client()
-    resp = client.post("/users", data=user_data)
+    resp = client.post("/users", data=user_data)  # create test user
     assert resp.status_code == 200
     yield
-    resp = client.delete("/users", data=user_data)
+    # get access_token
+    resp = client.post(LOGIN_ENDPOINT, data=test_user_data)
     assert resp.status_code == 200
+    access_token = resp.json["access_token"]
+    headers = {"Authorization": "Bearer " + access_token}
+    # delete user
+    resp = client.delete("/users", data=user_data, headers=headers)
+    assert resp.status_code == 200
+
+
+@pytest.yield_fixture(scope='function')
+def access_token(client, test_user_data):
+    resp = client.post(LOGIN_ENDPOINT, data=test_user_data)
+    assert resp.status_code == 200
+    access_token = resp.json["access_token"]
+    yield access_token

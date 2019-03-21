@@ -28,14 +28,6 @@ class TestSignUp:
         assert resp.status_code == 200
 
 
-@pytest.yield_fixture(scope='function')
-def access_token(client, test_user_data):
-    resp = client.post(LOGIN_ENDPOINT, data=test_user_data)
-    assert resp.status_code == 200
-    access_token = resp.json["access_token"]
-    yield access_token
-
-
 class TestLogin:
     def test_wrong_password(self, client, test_user_data):
         data = test_user_data.copy()

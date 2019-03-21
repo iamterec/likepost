@@ -6,6 +6,7 @@ from extensions import db
 from sqlalchemy.exc import IntegrityError, DataError
 from cerberus import Validator  # data validation
 from flask_jwt_extended import create_access_token
+from flask_jwt_extended import jwt_required, get_jwt_identity
 
 
 class Signup(Resource):
@@ -47,12 +48,39 @@ class Signup(Resource):
             return validator.errors, 400
 
     def delete(self):
+        '''Only for convience purposes. It is not the part of the REST API'''
         data = self.parser.parse_args()
         user = User.query.filter(User.email==data["email"]).first()
         if user:
             db.session.delete(user)
             db.session.commit()
             return {"user": "User has been deleted"}, 200
+
+
+class UserMe(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument("email", type=str)
+    parser.add_argument("password", type=str)
+
+    @jwt_required
+    def get(self):
+        user_identity = get_jwt_identity()
+        user = User.query.filter(User.email == user_identity["email"]).first()
+        if user:
+            return {"user": user.to_dict()}
+        else:
+            return {"error": "User not found"}, 404
+
+    @jwt_required
+    def delete(self):
+        data = self.parser.parse_args()
+        user = User.query.filter(User.email==data["email"]).first()
+        if user and user.check_password(data["password"]):
+            db.session.delete(user)
+            db.session.commit()
+            return {"user": "User has been deleted"}, 200
+        else:
+            return {"msg": "Wrong credentials"}, 422
 
 
 class Login(Resource):
