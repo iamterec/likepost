@@ -24,6 +24,7 @@ class User(Endpoints):
         resp = requests.post(self.login_url, data=self.to_dict())
         if resp.status_code == 200:
             access_token = resp.json()["access_token"]
+            self.access_token = access_token
             return access_token
         else:
             print("\nCann't login user {}".format(self.username))
@@ -31,10 +32,9 @@ class User(Endpoints):
     def get_access_token(self, update=False):
         if update:
             access_token = self._login()
-            self.access_token = access_token
             return access_token
         else:
-            return getattr(self, "access_token", self._login())
+            return getattr(self, "access_token", False) or self._login()
 
     def delete(self, silent=True):
         access_token = self.get_access_token()
