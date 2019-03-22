@@ -1,5 +1,8 @@
+USE_CLEARBIT = False
+USE_EMAILHUNTER = False
+
+
 class BaseConfig:
-    # SERVER_NAME = '0.0.0.0:8000'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 

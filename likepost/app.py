@@ -18,7 +18,6 @@ def create_app(settings_override=None):
 
     connect_resources(api)
     init_extensions(app)
-    # db.create_all()
     return app
 
 

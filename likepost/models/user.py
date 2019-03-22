@@ -5,13 +5,14 @@ from extensions import db
 class User(db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(64))
     email = db.Column(db.String(128), unique=True, index=True)
     password = db.Column(db.String(256), nullable=False)
+    username = db.Column(db.String(64))
+    additional_data = db.Column(db.JSON)
+    verified = db.Column(db.Boolean)
     posts = db.relationship("Post", cascade="all, delete-orphan",
                             backref="creator", lazy=True,
                             foreign_keys="Post.creator_id")
-    aditional_data = db.Column(db.JSON)
     liked_posts = db.relationship("Post", secondary="likes",
                                   back_populates="liked_by")
 

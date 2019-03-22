@@ -20,6 +20,7 @@ cerberus
 #async tasks
 celery
 clearbit
+pyhunter
 
 # Server
 gunicorn

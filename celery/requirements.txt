@@ -1,6 +1,7 @@
 celery
 requests
 clearbit
+pyhunter
 
 psycopg2
 sqlalchemy==1.2

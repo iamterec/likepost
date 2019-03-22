@@ -7,6 +7,7 @@ from models.user import User
 
 
 class PostsResource(Resource):
+    '''route: /posts'''
     parser = reqparse.RequestParser()
     parser.add_argument("title", type=str)
     parser.add_argument("content", type=str)
@@ -33,9 +34,17 @@ class PostsResource(Resource):
 
 
 class OnePostResource(Resource):
+    '''route: /posts/<post_id>'''
+
+    def get(self, post_id):
+        post = Post.query.get(post_id)
+        if post:
+            return {"post": post.to_dict()}
+        else:
+            return {"error": "Post not found."}, 404
+
     @jwt_required
     def delete(self, post_id):
-        print("hello from delete")
         user_identity = get_jwt_identity()
         user = User.query.filter(User.email == user_identity["email"]).first()
         post = Post.query.filter(Post.creator_id == user.id).filter(Post.id == post_id).first()
@@ -48,6 +57,8 @@ class OnePostResource(Resource):
 
 
 class LikeResource(Resource):
+    '''route: /posts/<post_id>/likes'''
+
     @jwt_required
     def put(self, post_id):
         user_identity = get_jwt_identity()

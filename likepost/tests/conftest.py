@@ -35,7 +35,7 @@ def client(app):
 
 
 @pytest.yield_fixture(scope="session", autouse=True)
-def client_with_user(app, test_user_data):
+def create_test_user(app, test_user_data):
     user_data = test_user_data
     client = app.test_client()
     resp = client.post("/users", data=user_data)  # create test user
@@ -47,7 +47,7 @@ def client_with_user(app, test_user_data):
     access_token = resp.json["access_token"]
     headers = {"Authorization": "Bearer " + access_token}
     # delete user
-    resp = client.delete("/users", data=user_data, headers=headers)
+    resp = client.delete("/users/me", data=user_data, headers=headers)
     assert resp.status_code == 200
 
 

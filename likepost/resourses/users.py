@@ -2,18 +2,18 @@ import datetime
 from flask_restful import Resource, reqparse
 from models.user import User
 from extensions import db
+from config.general import USE_CLEARBIT, USE_EMAILHUNTER
 
 from sqlalchemy.exc import IntegrityError, DataError
 from cerberus import Validator  # data validation
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
-from tasks.users import get_aditional_data_for_user
+from tasks.users import get_aditional_data_for_user, verify_email
 
-CLEARBIT = True
-EMAILHUNTER = False
 
 class Signup(Resource):
+    '''route: /users'''
     parser = reqparse.RequestParser()
     parser.add_argument("username", type=str)
     parser.add_argument("email", type=str)
@@ -31,8 +31,10 @@ class Signup(Resource):
         try:
             db.session.add(user)
             db.session.commit()
-            if CLEARBIT:
+            if USE_CLEARBIT:
                 get_aditional_data_for_user.delay(user=user.to_dict(username=True))
+            if USE_EMAILHUNTER:
+                verify_email.delay(user=user.to_dict())
         except IntegrityError:
             db.session.rollback()
             return {"user": "User with this email already exist"}, 409
@@ -53,17 +55,9 @@ class Signup(Resource):
         if not result:
             return validator.errors, 400
 
-    def delete(self):
-        '''Only for convience purposes. It is not the part of the REST API'''
-        data = self.parser.parse_args()
-        user = User.query.filter(User.email == data["email"]).first()
-        if user:
-            db.session.delete(user)
-            db.session.commit()
-            return {"user": "User has been deleted"}, 200
-
 
 class UserMe(Resource):
+    '''route: /users/me'''
     parser = reqparse.RequestParser()
     parser.add_argument("email", type=str)
     parser.add_argument("password", type=str)
@@ -90,6 +84,7 @@ class UserMe(Resource):
 
 
 class Login(Resource):
+    '''route: /users/login'''
     parser = reqparse.RequestParser()
     parser.add_argument("email", required=True, type=str)
     parser.add_argument("password", required=True, type=str)

@@ -1,8 +1,11 @@
 from extensions import db
 
+
+# Table for many to many relationships, used for likes
 association_table = db.Table("likes", db.Model.metadata,
                              db.Column("post", db.Integer, db.ForeignKey("posts.id")),
                              db.Column("user", db.Integer, db.ForeignKey("users.id")))
+
 
 class Post(db.Model):
     __tablename__ = "posts"
