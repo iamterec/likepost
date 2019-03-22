@@ -10,6 +10,7 @@ services:
             - "8000:8000"
         volumes:
             - ./likepost/:/likepost/
+            - ./celery/tasks/:/likepost/tasks/
         command: >
             gunicorn -b 0.0.0.0:8000
             --access-logfile -
@@ -31,3 +32,18 @@ services:
         build: ./bot/
         volumes:
             - ./bot/:/bot/
+
+    rabbitmq:
+        restart: always
+        image: rabbitmq
+        ports:
+            - "5672:5672"
+
+    celery:
+        build: ./celery/
+        restart: always
+        volumes:
+            - ./celery/:/celery/
+        depends_on:
+            - rabbitmq
+        command: celery -A tasks.users worker --uid celery_user --loglevel=info

@@ -8,6 +8,10 @@ from cerberus import Validator  # data validation
 from flask_jwt_extended import create_access_token
 from flask_jwt_extended import jwt_required, get_jwt_identity
 
+from tasks.users import get_aditional_data_for_user
+
+CLEARBIT = True
+EMAILHUNTER = False
 
 class Signup(Resource):
     parser = reqparse.RequestParser()
@@ -27,6 +31,8 @@ class Signup(Resource):
         try:
             db.session.add(user)
             db.session.commit()
+            if CLEARBIT:
+                get_aditional_data_for_user.delay(user=user.to_dict(username=True))
         except IntegrityError:
             db.session.rollback()
             return {"user": "User with this email already exist"}, 409
@@ -50,7 +56,7 @@ class Signup(Resource):
     def delete(self):
         '''Only for convience purposes. It is not the part of the REST API'''
         data = self.parser.parse_args()
-        user = User.query.filter(User.email==data["email"]).first()
+        user = User.query.filter(User.email == data["email"]).first()
         if user:
             db.session.delete(user)
             db.session.commit()
@@ -74,7 +80,7 @@ class UserMe(Resource):
     @jwt_required
     def delete(self):
         data = self.parser.parse_args()
-        user = User.query.filter(User.email==data["email"]).first()
+        user = User.query.filter(User.email == data["email"]).first()
         if user and user.check_password(data["password"]):
             db.session.delete(user)
             db.session.commit()

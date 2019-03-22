@@ -11,6 +11,7 @@ class User(db.Model):
     posts = db.relationship("Post", cascade="all, delete-orphan",
                             backref="creator", lazy=True,
                             foreign_keys="Post.creator_id")
+    aditional_data = db.Column(db.JSON)
     liked_posts = db.relationship("Post", secondary="likes",
                                   back_populates="liked_by")
 

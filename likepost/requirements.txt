@@ -17,5 +17,9 @@ pytest
 # data validation
 cerberus
 
+#async tasks
+celery
+clearbit
+
 # Server
 gunicorn

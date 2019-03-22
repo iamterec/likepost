@@ -1,0 +1,6 @@
+celery
+requests
+clearbit
+
+psycopg2
+sqlalchemy==1.2
