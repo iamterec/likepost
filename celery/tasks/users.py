@@ -32,7 +32,6 @@ def save_additional_data(user, data):
 def save_verification(verdict, user):
     query = "UPDATE users SET verified = {} WHERE id = {}".\
         format(verdict, user["id"])
-    print("Query is: ", query)
     try:
         conn = psycopg2.connect(host="postgres", database="likepost",
                                 user=secret.DATABASE_USER,
