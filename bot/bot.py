@@ -12,17 +12,9 @@ class Bot:
     def __init__(self, config):
         self.__dict__.update(config)
         self.faker = Faker()
-        self.old_users = self.get_users()
+        self.old_users = get_users()
         self.new_users = []
 
-    @staticmethod
-    def get_users():
-        with open("users.json", "r") as file:
-            try:
-                users = json.load(file)
-            except JSONDecodeError:
-                return []
-        return [User(user) for user in users]
 
     def write_users(self):
         with open("users.json", "w") as file:
@@ -31,7 +23,7 @@ class Bot:
             json.dump(old_users + new_users, file, indent=4)
 
     def generate_user(self):
-        rand_chars = get_random_string(3, lowercase=True)
+        rand_chars = get_random_string(3, only_lowercase=True)
         name = self.faker.name()
         email = name.replace(" ", "").lower() + rand_chars + "@mail.com"
         password = get_random_string(12)
@@ -100,14 +92,19 @@ class Bot:
         else:
             self.write_users()
 
-def get_random_string(length, lowercase=False):
-    if lowercase:
-        return "".join(random.choice(string.ascii_lowercase + string.digits)
-                       for _ in range(length))
-    else:
-        return "".join(random.choice(string.ascii_lowercase +
-                                     string.ascii_uppercase + string.digits)
-                       for _ in range(length))
+
+def get_users():
+    with open("users.json", "r") as file:
+        try:
+            users = json.load(file)
+        except JSONDecodeError:
+            return []
+    return [User(user) for user in users]
+
+
+def get_random_string(length, only_lowercase=False):
+    letters = string.ascii_lowercase if only_lowercase else string.ascii_letters
+    return "".join(random.choice(letters + string.digits) for _ in range(length))
 
 
 def read_config(path):
