@@ -40,3 +40,10 @@ docker-compose exec api python -m pytest ./tests
 To use clearbit.com/enrichment and emailhunter.co:<br/>
 *  Fill API keys in *`celery/config/secret.py`*
 *  Than change `USE_CLEARBIT` and `USE_EMAILHUNTER` variables to *`True`* in *`likepost/config/general.py`*
+
+### Swagger documentation:
+To run Swagger UI on *`localhost:8000`* navigate to *`swagger/`* and execute:
+```shell
+docker-compose up
+```
+![swagger documentation](http://i66.tinypic.com/2cxcbhy.png)

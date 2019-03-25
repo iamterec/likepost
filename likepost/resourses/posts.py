@@ -24,7 +24,7 @@ class PostsResource(Resource):
         except IntegrityError:
             print('Users id: ', user.id)
             db.session.rollback()
-            return {"error": "Wrong data"}
+            return {"error": "Wrong data"}, 422
         return {"post": post.to_dict()}
 
     def get(self):

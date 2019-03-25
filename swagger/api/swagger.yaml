@@ -1,0 +1,254 @@
+swagger: "2.0"
+info:
+    description: "This is a simple API for user handling and post creation."
+    version: "0.0.1"
+    title: "Likepost API"
+    contact:
+        email: "iamterec@gmail.com"
+    license:
+        name: "Apache 2.0"
+        url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "0.0.0.0:8000"
+basePath: "/v1"
+tags:
+    - name: "users"
+      description: "User management."
+    - name: "posts"
+      description: "Post management."
+schemes:
+    - "http"
+paths:
+    /users:
+        post:
+            tags:
+                - "users"
+            summary: "Signup a new user."
+            description: ""
+            operationId: "addUser"
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  description: "Register a new user."
+                  required: true
+                  schema:
+                      $ref: "#/definitions/User"
+            responses:
+                409:
+                    description: "User with this email already exist"
+                403:
+                    description: "The data is too long"
+                422:
+                    description: "Data validation arror"
+
+    /users/login:
+        post:
+            tags:
+                - "users"
+            summary: "Login a user."
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  description: "Login a user. Returns access_token"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/User"
+            responses:
+                200:
+                    description: "returns access_token"
+                422:
+                    description: "Wrong e-mail or password"
+
+    /users/me:
+        get:
+            tags:
+                - "users"
+            summary: "Get profile information."
+            produces:
+                - "application/json"
+            security:
+                - api_key: []
+            responses:
+                200:
+                    description: "Returns user data"
+                    schema:
+                        $ref: "#/definitions/Profile"
+                404:
+                    description: "User not found."
+        delete:
+            tags:
+                - "users"
+            summary: "Delete users's profile"
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  description: "Delete a user and all related information from the database."
+                  required: true
+                  schema:
+                      $ref: "#/definitions/User"
+            responses:
+                200:
+                    description: "User has been deleted"
+                422:
+                    description: "Wrong credentials"
+            security:
+                - api_key: []
+
+    /posts:
+        post:
+            tags:
+                - "posts"
+            summary: "Create a new post."
+            consumes:
+                - "application/json"
+            produces:
+                - "application/json"
+            parameters:
+                - in: "body"
+                  name: "body"
+                  description: "Post object"
+                  required: true
+                  schema:
+                      $ref: "#/definitions/Post"
+            responses:
+                200:
+                    description: "Post has been deleted"
+                422:
+                    description: "Wrong data"
+            security:
+                - api_key: []
+
+    /posts/{post_id}:
+        get:
+            tags:
+                - "posts"
+            summary: "Get post by id"
+            parameters:
+                - name: "post_id"
+                  in: "path"
+                  description: "ID of post to return"
+                  required: true
+                  type: "integer"
+                  format: "int64"
+            responses:
+                200:
+                    description: "Returns one post data."
+                    schema:
+                        $ref: "#/definitions/Post"
+                404:
+                    description: "Post not found."
+
+        delete:
+            tags:
+                - "posts"
+            summary: "Delete post by id"
+            parameters:
+                - name: "post_id"
+                  in: "path"
+                  description: "ID of post to delete"
+                  required: true
+                  type: "integer"
+                  format: "int64"
+            responses:
+                200:
+                    description: "Post has been deleted."
+                    schema:
+                        $ref: "#/definitions/Post"
+                404:
+                    description: "Post not found."
+            security:
+                - api_key: []
+
+    /posts/{post_id}/likes:
+        put:
+            tags:
+                - "posts"
+            summary: "Like the post with id = post_id"
+            parameters:
+                - name: "post_id"
+                  in: "path"
+                  description: "ID of post to return"
+                  required: true
+                  type: "integer"
+                  format: "int64"
+            responses:
+                200:
+                    description: "Post has been liked by you."
+                404:
+                    description: "Post not found."
+                409:
+                    description: "Post already liked by you."
+            security:
+                - api_key: []
+
+        delete:
+            tags:
+                - "posts"
+            summary: "Unlike the post with id = post_id"
+            parameters:
+                - name: "post_id"
+                  in: "path"
+                  description: "ID of post to return"
+                  required: true
+                  type: "integer"
+                  format: "int64"
+            responses:
+                200:
+                    description: "You have canceled your like."
+                404:
+                    description: "Post not found."
+                422:
+                    description: "You didn't like this post."
+            security:
+                - api_key: []
+
+securityDefinitions:
+    api_key:
+        type: "apiKey"
+        name: "api_key"
+        in: "header"
+
+definitions:
+    User:
+        type: "object"
+        required:
+            - "email"
+            - "password"
+        properties:
+            email:
+                type: "string"
+            password:
+                type: "string"
+            username:
+                type: "string"
+                description: "Optional parameter"
+    Profile:
+        type: "object"
+        properties:
+            id:
+                type: "string"
+            email:
+                type: "string"
+            username:
+                type: "string"
+                description: "Optional parameter"
+    Post:
+        type: "object"
+        properties:
+            id:
+                type: "string"
+            title:
+                type: "string"
+            content:
+                type: "string"

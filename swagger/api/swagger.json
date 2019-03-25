@@ -1,0 +1,388 @@
+{
+    "tags": [
+        {
+            "name": "users",
+            "description": "User management."
+        },
+        {
+            "name": "posts",
+            "description": "Post management."
+        }
+    ],
+    "schemes": [
+        "http"
+    ],
+    "definitions": {
+        "User": {
+            "type": "object",
+            "properties": {
+                "password": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Optional parameter"
+                }
+            },
+            "required": [
+                "email",
+                "password"
+            ]
+        },
+        "Profile": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "username": {
+                    "type": "string",
+                    "description": "Optional parameter"
+                }
+            }
+        },
+        "Post": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "basePath": "/v1",
+    "securityDefinitions": {
+        "api_key": {
+            "name": "api_key",
+            "type": "apiKey",
+            "in": "header"
+        }
+    },
+    "paths": {
+        "/posts": {
+            "post": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Post object",
+                        "schema": {
+                            "$ref": "#/definitions/Post"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post has been deleted"
+                    },
+                    "422": {
+                        "description": "Wrong data"
+                    }
+                },
+                "tags": [
+                    "posts"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Create a new post.",
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        },
+        "/posts/{post_id}/likes": {
+            "put": {
+                "summary": "Like the post with id = post_id",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "type": "integer",
+                        "description": "ID of post to return",
+                        "required": true,
+                        "in": "path",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post has been liked by you."
+                    },
+                    "409": {
+                        "description": "Post already liked by you."
+                    },
+                    "404": {
+                        "description": "Post not found."
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "tags": [
+                    "posts"
+                ]
+            },
+            "delete": {
+                "summary": "Unlike the post with id = post_id",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "type": "integer",
+                        "description": "ID of post to return",
+                        "required": true,
+                        "in": "path",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "You have canceled your like."
+                    },
+                    "404": {
+                        "description": "Post not found."
+                    },
+                    "422": {
+                        "description": "You didn't like this post."
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "tags": [
+                    "posts"
+                ]
+            }
+        },
+        "/posts/{post_id}": {
+            "delete": {
+                "summary": "Delete post by id",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "type": "integer",
+                        "description": "ID of post to delete",
+                        "required": true,
+                        "in": "path",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Post has been deleted.",
+                        "schema": {
+                            "$ref": "#/definitions/Post"
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found."
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "tags": [
+                    "posts"
+                ]
+            },
+            "get": {
+                "summary": "Get post by id",
+                "parameters": [
+                    {
+                        "name": "post_id",
+                        "type": "integer",
+                        "description": "ID of post to return",
+                        "required": true,
+                        "in": "path",
+                        "format": "int64"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Returns one post data.",
+                        "schema": {
+                            "$ref": "#/definitions/Post"
+                        }
+                    },
+                    "404": {
+                        "description": "Post not found."
+                    }
+                },
+                "tags": [
+                    "posts"
+                ]
+            }
+        },
+        "/users/me": {
+            "delete": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Delete a user and all related information from the database.",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User has been deleted"
+                    },
+                    "422": {
+                        "description": "Wrong credentials"
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Delete users's profile",
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ]
+            },
+            "get": {
+                "summary": "Get profile information.",
+                "responses": {
+                    "200": {
+                        "description": "Returns user data",
+                        "schema": {
+                            "$ref": "#/definitions/Profile"
+                        }
+                    },
+                    "404": {
+                        "description": "User not found."
+                    }
+                },
+                "security": [
+                    {
+                        "api_key": []
+                    }
+                ],
+                "tags": [
+                    "users"
+                ],
+                "produces": [
+                    "application/json"
+                ]
+            }
+        },
+        "/users": {
+            "post": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Register a new user.",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "409": {
+                        "description": "User with this email already exist"
+                    },
+                    "403": {
+                        "description": "The data is too long"
+                    },
+                    "422": {
+                        "description": "Data validation arror"
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "description": "",
+                "summary": "Signup a new user.",
+                "operationId": "addUser"
+            }
+        },
+        "/users/login": {
+            "post": {
+                "parameters": [
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "description": "Login a user. Returns access_token",
+                        "schema": {
+                            "$ref": "#/definitions/User"
+                        },
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "returns access_token"
+                    },
+                    "422": {
+                        "description": "Wrong e-mail or password"
+                    }
+                },
+                "tags": [
+                    "users"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Login a user.",
+                "consumes": [
+                    "application/json"
+                ]
+            }
+        }
+    },
+    "info": {
+        "title": "Likepost API",
+        "version": "0.0.1",
+        "license": {
+            "name": "Apache 2.0",
+            "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+        },
+        "contact": {
+            "email": "iamterec@gmail.com"
+        },
+        "description": "This is a simple API for user handling and post creation."
+    },
+    "swagger": "2.0",
+    "host": "0.0.0.0:8000"
+}
